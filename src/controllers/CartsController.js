@@ -4,9 +4,12 @@ const { CartsModel } = require("../dao/models/CartsModel.js");
 const { TicketsModel } = require("../dao/models/TicketsModel");
 const { cartsService } = require("../repository/Carts.service");
 const { productsService } = require("../repository/Products.service");
+const { ticketsService } = require("../repository/Tickets.service");
 const { processesErrors } = require("../utils/utils");
+const nodemailer = require("nodemailer");
+const { config } = require("../config/config");
 
-TicketsModel
+
 
 class CartsController {
 
@@ -348,22 +351,24 @@ class CartsController {
     static purchaseCart = async (req, res) => {
 
         console.log("************************************Purchase");
-        const { cid } = req.params;
 
+        // Validar Carrito
+        const { cid } = req.params;
         if (!isValidObjectId(cid)) {
             res.setHeader('Content-type', 'application/json');
             return res.status(400).json({ error: `Carrito id: ${cid} no valido,` })
         }
 
-        console.log("*req.user: ", req.user);
-        console.log("*cid: ", cid);
-        console.log("*req.user.cart: ", req.user.cartid);
+        /*
+      // validado con mioddleware para que si pueda el rol admin poder hacer mod de un carrito ajeno
+      if (req.user.cartid != cid) {
+          res.setHeader('Content-Type', 'application/json');
+          return res.status(400).json({ error: `El cart que quiere comprar no pertenece al usuario autenticado` })
+      }
+        */
 
-        if (req.user.cartid != cid) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `El cart que quiere comprar no pertenece al usuario autenticado` })
-        }
 
+        //Obtener carrito desde la BBDD, si se encuentra sigue, caso contrario sale.
         try {
             let cart = await cartsService.getCartBy({ _id: cid });
             if (!cart) {
@@ -371,27 +376,27 @@ class CartsController {
                 return res.status(404).json({ error: `Carrito con id: ${cid} no encontrado.` });
             }
 
-            console.log("*cart: ", cart);
-
+            // Arreglos para almacenar productos constock o sin stock suficiente.
             const prodconStock = [];
             const prodsinStock = [];
             let error = false;
 
-
-            // Verificar stock de cada producto
+            // Verificar existencia de cada producto del carrito
             for (let i = 0; i < cart.products.length; i++) {
                 const codigo = cart.products[i].product._id;
                 const cantidad = cart.products[i].quantity;
                 const producto = await productsService.getProductBy({ _id: codigo });
 
-
+                // Si producto no existe o no tiene el stock suficiente (Producto sin stock suficiente)
                 if (!producto || producto.stock < cantidad) {
-                    // Producto sin stock suficiente
+                    //Almaceno el producto en el arreglo de prod sin stock
                     prodsinStock.push({ product: codigo, quantity: cantidad });
+                    //Bandera para determinar que hubo un error en el stock del producto
                     error = true;
                 } else {
+                    // Producto con stock suficiente,
                     if (producto.stock >= cantidad) {
-                        // Producto con stock suficiente, restarlo del inventario
+                        //Almaceno el producto en el arreglo de prod con stock. Este arreglo es con el que se continua la compra
                         prodconStock.push({
                             codigo,
                             cantidad,
@@ -399,16 +404,22 @@ class CartsController {
                             descrip: producto.title,
                             subtotal: producto.price * cantidad,
                         });
+                        // restarlo del inventario de la BBDD
                         producto.stock -= cantidad;
                         await productsService.updateProduct(codigo, producto);
                     } else {
                         error = true;
                         prodsinStock.push({ product: codigo, quantity: cantidad });
                     }
-
                 }
-
             }
+
+            console.log("*req.user: ", req.user);
+            console.log("*cid: ", cid);
+            console.log("*req.user.cart: ", req.user.cartid);
+            console.log("*cart: ", cart);
+            console.log("prodconStock: ", prodconStock);
+            console.log("prodsinStock: ", prodsinStock);
 
             // Si no hay productos con stock suficiente
             if (prodconStock.length == 0) {
@@ -427,12 +438,11 @@ class CartsController {
             // Generar número aleatorio de 5 dígitos
             const randomPart = Math.floor(10000 + Math.random() * 90000);
 
-            const ticket = await TicketsModel.create({
-                code: `TCKT-${datePart}-${randomPart}`,
-                purchase_datetime: new Date(),
-                amount: prodconStock.reduce((acum, item) => acum += item.subtotal, 0),
-                purchaser: req.user.email,
-            });
+            let tcode = `TCKT-${datePart}-${randomPart}`;
+            let tamount = prodconStock.reduce((acum, item) => acum += item.subtotal, 0);
+
+            //const ticket = await TicketsModel.create({ code: `TCKT-${datePart}-${randomPart}`, purchase_datetime: new Date(), amount: prodconStock.reduce((acum, item) => acum += item.subtotal, 0), purchaser: req.user.email, });
+            const ticket = await ticketsService.createTicket({ code: tcode, purchase_datetime: new Date(), amount: tamount, purchaser: req.user.email });
 
             console.log("*ticket: ", ticket);
 
@@ -448,29 +458,65 @@ class CartsController {
 
 
 
+
+// ***********************************
+
+        // Configuración del transporte de Nodemailer
+        const transporter = nodemailer.createTransport({
+            service: 'gmail', 
+            port: 587,
+            auth: {
+                user: config.GMAIL_ACCOUNT,
+                pass: config.GMAIL_CODE
+            }
+        });
+
+        // Configuración del correo
+        const mailOptions = {
+            from: config.GMAIL_ACCOUNT,
+            to: req.user.email,
+            subject: "Confirmación de Compra",
+            html: `
+                <h1>Gracias por tu compra</h1>
+                <p>Tu ticket de compra es: ${ticket.code}</p>
+                <p>Total pagado: $${tamount.toFixed(2)}</p>
+                ${error ? `<p>Algunos productos no pudieron comprarse debido a falta de stock:</p>
+                <ul>${prodsinStock.map(item => `<li>${item.product._id}</li>`).join('')}</ul>` : ''}
+            `
+        };
+
+        // Enviar el correo
+        await transporter.sendMail(mailOptions);
+
+// *****************************
+
             // enviar un mail
             // try {
-
+          
             // } catch (error) {
 
             // }
 
-            if(error){
-                res.setHeader('Content-Type','application/json');
-                return res.status(200).json({ticket, alerta: `Atención: algún ítem no pudo ser procesado por falta de inventario. Consulte al administrador`});        
-            }else{
-                res.setHeader('Content-Type','application/json');
-                return res.status(200).json(ticket);        
-            }               
+            if (error) {
+                res.setHeader('Content-Type', 'application/json');
+                return res.status(200).json({
+                    ticket,
+                    alerta: `Atencion: algún/os ítem/s no se pudieron procesar por falta de stock al momento de la compra.
+                             Intente comprar los productos restantes mas tarde o llamemos.`,
+                    "Prods_sin_Stock": prodsinStock.map(p => p.product._id)
+                });
+            } else {
+                res.setHeader('Content-Type', 'application/json');
+                return res.status(200).json(ticket);
+            }
         } catch (error) {
             console.log("Error en el proceso de compra.");
             processesErrors(res, error);
         }
 
-
     }
 
-
 }
+
 
 module.exports = { CartsController };

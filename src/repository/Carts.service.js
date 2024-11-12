@@ -61,9 +61,6 @@ class CartsService {
         return cart;
     }
 
-
-
-
     // 3.Agregar carrito
     async createCart() {
         return await this.cartsDAO.createCart();
@@ -78,7 +75,6 @@ class CartsService {
     async updateProdToCart(cid, cart) {
         return await this.cartsDAO.updateProdToCart(cid, cart);
     }
-
 
 }
 

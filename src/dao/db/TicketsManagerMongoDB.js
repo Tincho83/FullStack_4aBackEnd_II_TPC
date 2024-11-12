@@ -1,22 +1,23 @@
-// dao/TicketsManager.js
 const { TicketsModel } = require("../models/TicketsModel");
 
-class TicketsManager {
-    async create(ticketData) {
-        return await TicketsModel.create(ticketData);
+class TicketsManagerMongoDB {
+
+    static async getTickets() {
+        return await TicketsModel.find().lean();
     }
 
-    async getByCode(code) {
-        return await TicketsModel.findOne({ code });
+    static async getTicketBy (filter = {}) {
+        return await TicketsModel.findOne(filter).lean();
     }
 
-    async getAll() {
-        return await TicketsModel.find({});
+    static async createTicket(ticketData) {
+        let tktnew = await TicketsModel.create(ticketData);
+        return tktnew.toJSON();
     }
 
-    async deleteByCode(code) {
-        return await TicketsModel.findOneAndDelete({ code });
+    static async deleteTicket(id) {
+        return await TicketsModel.findByIdAndDelete(id, { new: true }).lean();
     }
 }
 
-module.exports = new TicketsManager();
+module.exports = TicketsManagerMongoDB;

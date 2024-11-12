@@ -79,8 +79,9 @@ btnSubmit.addEventListener("click", async (e) => {
 
 function ModifyProduct(_id, title, description, code, price, stock, category) {
 
-    console.log(_id, title, description, code, price, stock, category);
+    //console.log("prod: ", _id, title, description, code, price, stock, category);
     addstatus = false;
+
 
     window.scrollTo({
         top: 0,
@@ -104,8 +105,9 @@ function ModifyProduct(_id, title, description, code, price, stock, category) {
 
             event.preventDefault();
             const updatedProductId = {
-                               
+
             };
+
             const updatedProduct = {
                 title: document.getElementById('title').value,
                 description: document.getElementById('description').value,
@@ -113,14 +115,15 @@ function ModifyProduct(_id, title, description, code, price, stock, category) {
                 price: parseFloat(document.getElementById('price').value),
                 stock: parseInt(document.getElementById('stock').value, 10),
                 category: document.getElementById('category').value
-            };            
+            };
 
             if (isNaN(updatedProduct.price) || isNaN(updatedProduct.stock) || typeof updatedProduct.price == null || typeof updatedProduct.stock == null) {
                 alert('Los campos precio y stock deben ser numericos.');
                 return;
             }
 
-            if (!title || !description || !code || !price || !stock || !category) {
+            if (!updatedProduct.title || !updatedProduct.description || !updatedProduct.code || !updatedProduct.price || !updatedProduct.stock || !updatedProduct.category) {
+            //if (!title || !description || !code || !price || !stock || !category) {
                 alert('Comprobar datos ingresados. Todos los campos son obligatorios.');
                 return;
             }
@@ -284,23 +287,23 @@ function eliminarProductoDelDOM(productId) {
 // Funcion para agregar producto al carrito
 async function AddProducttoCart(productId) {
 
-       // Obtener Cartid desde LocalStorage IdCart
+    // Obtener Cartid desde LocalStorage IdCart
     //let cartId = localStorage.getItem("IdCart");
 
     // Obtener CartId desde Cookie 'cartUser'
     let cartId = getCookie("cartUser");
 
     if (!cartId || cartId == null || cartId == undefined || cartId == "undefined") {
-        
+
         Swal.fire({
             icon: 'error',
             title: 'Error',
             text: 'No tienes un carrito. Inicia sesion, si el problema continua contacta a nuestro soporte.',
         });
         return;
-        
-             
-        
+
+
+
         // Si no hay carrito en localStorage, creamos uno nuevo
         /*
         try {
@@ -361,7 +364,7 @@ async function AddProducttoCart(productId) {
             },
         });
 
-        if(response.status >= 400){
+        if (response.status >= 400) {
             let { error } = await response.json();
             alert(error);
         }
@@ -392,7 +395,7 @@ async function AddProducttoCart(productId) {
 
 // Funcion para ver el carrito
 function ViewCart() {
-        // Obtener Cartid desde LocalStorage IdCart
+    // Obtener Cartid desde LocalStorage IdCart
     //let cartId = localStorage.getItem("IdCart");
 
     // Obtener CartId desde Cookie 'cartUser'

@@ -1,26 +1,32 @@
-// services/TicketsService.js
-const TicketsRepository = require("../repository/TicketsRepository");
+const TicketsDAO = require("../dao/db/TicketsManagerMongoDB");
 
 class TicketsService {
-    async createNewTicket(purchaser, amount) {
-        const ticketData = {
-            purchaser,
-            amount
-        };
-        return await TicketsRepository.createTicket(ticketData);
+
+    constructor(DAO) {
+        this.ticketsDAO = DAO;
     }
 
-    async getTicketByCode(code) {
-        return await TicketsRepository.findTicketByCode(code);
+    async getTickets() {
+        console.log("... Tickets Service");
+        return await this.ticketsDAO.getTickets();
     }
 
-    async getAllTickets() {
-        return await TicketsRepository.getAllTickets();
+    async getTicketBy(filter = {}) {        
+        return await this.ticketsDAO.getTicketBy(filter);
     }
 
-    async deleteTicket(code) {
-        return await TicketsRepository.deleteTicketByCode(code);
+    async createTicket(ticketData) {
+    //async createTicket(purchaser, amount) {
+        // const ticketData = { purchaser, amount };
+        //return await TicketsRepository.createTicket(ticketData);
+        return await this.ticketsDAO.createTicket(ticketData);
+    }
+
+    async deleteTicket(id) {
+        return await this.ticketsDAO.deleteTicket(id);
     }
 }
 
-module.exports = new TicketsService();
+const ticketsService = new TicketsService(TicketsDAO);
+
+module.exports = { ticketsService };

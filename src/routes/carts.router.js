@@ -97,7 +97,7 @@ router.post('/', async (req, res) => {
 */
 
 //4.Agregar producto al carrito
-router.post('/:cid([a-f0-9]+)/product/:pid([a-f0-9]+)', passport.authenticate("current", { session: false }), auth(['none']), cartProtectMiddleware, CartsController.addProdToCart)
+router.post('/:cid([a-f0-9]+)/product/:pid([a-f0-9]+)', passport.authenticate("current", { session: false }), auth(['none']), cartProtectMiddleware(['admin']), CartsController.addProdToCart)
 /*                                                      
 router.post("/:cid/product/:pid", passport.authenticate("current", { session: false, failureRedirect: "/api/sessions/error" }), async (req, res) => {
 
@@ -150,7 +150,7 @@ router.post("/:cid/product/:pid", passport.authenticate("current", { session: fa
 */
 
 //5.Borra producto del carrito
-router.delete('/:cid([a-f0-9]+)/product/:pid([a-f0-9]+)', passport.authenticate("current", { session: false }), auth(['none']), cartProtectMiddleware, CartsController.updateProdToCart)
+router.delete('/:cid([a-f0-9]+)/product/:pid([a-f0-9]+)', passport.authenticate("current", { session: false }), auth(['none']), cartProtectMiddleware(['admin']), CartsController.updateProdToCart)
 /*
 router.delete('/:cid/product/:pid', async (req, res) => {
 
@@ -210,7 +210,7 @@ router.delete('/:cid/product/:pid', async (req, res) => {
 */
 
 //6.Actualizar carrito desde un arreglo
-router.put('/:cid([a-f0-9]+)', passport.authenticate("current", { session: false }), CartsController.updateCart)
+router.put('/:cid([a-f0-9]+)', passport.authenticate("current", { session: false }), cartProtectMiddleware(['admin']), CartsController.updateCart)
 /*
 router.put('/:cid', async (req, res) => {
 
@@ -281,7 +281,7 @@ router.put('/:cid', async (req, res) => {
 */
 
 //7.Actualizar en el carrito la cantidad de un producto pasado por body
-router.put('/:cid([a-f0-9]+)/product/:pid([a-f0-9]+)', passport.authenticate("current", { session: false }), auth(['none']), cartProtectMiddleware, CartsController.updateQtyProdToCart)
+router.put('/:cid([a-f0-9]+)/product/:pid([a-f0-9]+)', passport.authenticate("current", { session: false }), auth(['none']), cartProtectMiddleware(['admin']), CartsController.updateQtyProdToCart)
 /*
 router.put('/:cid/product/:pid', async (req, res) => {
     
@@ -347,7 +347,7 @@ router.put('/:cid/product/:pid', async (req, res) => {
 
 
 //8.Borrar todos los productos del carrito
-router.delete('/:cid([a-f0-9]+)', passport.authenticate("current", { session: false }), CartsController.deleteCart)
+router.delete('/:cid([a-f0-9]+)', passport.authenticate("current", { session: false }), cartProtectMiddleware(['admin']), CartsController.deleteCart)
 /*
 router.delete('/:cid', async (req, res) => {
 
@@ -395,7 +395,7 @@ router.delete('/:cid', async (req, res) => {
 */
 
 //9.Ticket
-router.post('/:cid([a-f0-9]+)/purchase', passport.authenticate("current", { session: false }), cartProtectMiddleware, CartsController.purchaseCart)
+router.post('/:cid([a-f0-9]+)/purchase', passport.authenticate("current", { session: false }), cartProtectMiddleware(['admin']), CartsController.purchaseCart)
 
 module.exports = { router };
 

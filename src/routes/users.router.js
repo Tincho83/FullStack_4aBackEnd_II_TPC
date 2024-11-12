@@ -3,6 +3,7 @@ const { isValidObjectId } = require("mongoose");
 const { UsersManagerMongoDB } = require("../dao/db/UsersManagerMongoDB");
 const { UsersModel } = require("../dao/models/UsersModel.js");
 const { UsersController } = require("../controllers/UsersController.js");
+const passport = require("passport");
 
 const router = Router();
 
@@ -65,7 +66,7 @@ router.post('/', async (req, res) => {
 });
 */
 
-router.put('/:userid([a-f0-9]+)', UsersController.updateUser)
+router.put('/:userid([a-f0-9]+)', passport.authenticate("current", { session: false }),UsersController.updateUser)
 /*
 router.put('/:userid', async (req, res) => {
 
@@ -93,7 +94,7 @@ router.put('/:userid', async (req, res) => {
 });
 */
 
-router.delete('/:userid([a-f0-9]+)', UsersController.deleteUser)
+router.delete('/:userid([a-f0-9]+)', passport.authenticate("current", { session: false }), UsersController.deleteUser)
 /*
 router.delete('/:userid', async (req, res) => {
 
