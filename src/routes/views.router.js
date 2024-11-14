@@ -5,15 +5,22 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const { fork, exec, spawn } = require("child_process");
 
-const ProductsManagerMongoDB = require("../dao/db/ProductsManagerMongoDB.js");
-const ProductsManager = require("../dao/filesystem/ProductsManager.js");
-const CartsManager = require("../dao/filesystem/CartsManager.js");
-const CartsManagerMongoDB = require("../dao/db/CartsManagerMongoDB.js");
+//const ProductsManagerMongoDB = require("../dao/db/ProductsManagerMongoDB.js");
+const ProductsManager  = require("../dao/db/ProductsManagerMongoDB.js");
+const { productsService } = require("../repository/Products.service.js");
+//const CartsManagerMongoDB = require("../dao/db/CartsManagerMongoDB.js");
+const CartsManager = require("../dao/db/CartsManagerMongoDB.js");
+const { cartsService } = require("../repository/Carts.service.js");
+const { usersService } = require("../repository/Users.service");
 
+//borrar
+//const ProductsManager = require("../dao/filesystem/ProductsManager.js");
+//const CartsManager = require("../dao/filesystem/CartsManager.js");
 const { config } = require("../config/config");
 const { passportCall } = require("../utils/utils.js");
 const auth = require("../middlewares/authMiddleware.js");
 const authMiddleware = require("../middlewares/authMiddleware.js");
+const { processesErrors } = require("../utils/utils");
 
 const router = Router();
 
@@ -109,15 +116,12 @@ router.get("/profile", passport.authenticate("current", { session: false, failur
     }
 
     try {
-        //let usuario = jwt.verify(req.cookies.currentUser, config.JWT_SECRET);
-        //req.user = usuario;
         usuario = req.user;
-        //console.log (usuario);
     } catch (error) {
         if (error.name === "TokenExpiredError") {
 
             res.clearCookie('currentUser');
-            //return res.status(401).json({ error: "Token expirado. Por favor, actualize la pagina e inicie sesión de nuevo." });
+
             alert("Token expirado. Por favor, actualize la pagina e inicie sesión de nuevo.");
             return res.redirect("/login");
         } else {
@@ -150,7 +154,6 @@ router.get("/resetpassword", (req, res) => {
 });
 
 //2. EndPoint para vista de producto en /products
-//router.get('/products/:pid', passport.authenticate("current", { session: false, failureRedirect: "/api/sessions/error" }), async (req, res) => {
 router.get('/products/:pid([a-f0-9]+)', passport.authenticate("current", { session: false, failureRedirect: "/api/sessions/error" }), async (req, res) => {
     //
     const { pid } = req.params;
@@ -161,7 +164,8 @@ router.get('/products/:pid([a-f0-9]+)', passport.authenticate("current", { sessi
 
     try {
         // Obtener los productos con el ID pid
-        let product = await ProductsManagerMongoDB.getProductBy({ _id: pid });
+        //let product = await ProductsManager.getProductBy({ _id: pid });
+        let product = await productsService.getProductBy({ _id: pid });
         if (!product) {
             res.setHeader('Content-type', 'application/json');
             return res.status(400).json({ error: `No existen productos con el id: ${pid}` });
@@ -177,12 +181,7 @@ router.get('/products/:pid([a-f0-9]+)', passport.authenticate("current", { sessi
         });
 
     } catch (error) {
-        console.log(error);
-        res.setHeader('Content-type', 'application/json');
-        return res.status(500).json({
-            error: `Error inesperado en el servidor, vuelva a intentar mas tarde o contacte con el administrador.`,
-            detalle: `${error.message}`
-        });
+        processesErrors(res, error);
     }
 })
 
@@ -197,7 +196,8 @@ router.get('/carts/:cid([a-f0-9]+)', passport.authenticate("current", { session:
 
     try {
         // Obtener los productos del carrito con el ID cid
-        const cart = await CartsManagerMongoDB.getCartBy(cid);
+        //const cart = await CartsManager.getCartBy(cid);
+        const cart = await cartsService.getCartBy(cid);
 
         if (!cart) {
             res.setHeader('Content-type', 'application/json');
@@ -224,12 +224,7 @@ router.get('/carts/:cid([a-f0-9]+)', passport.authenticate("current", { session:
         });
 
     } catch (error) {
-        console.log(error);
-        res.setHeader('Content-type', 'application/json');
-        return res.status(500).json({
-            error: `Error inesperado en el servidor, vuelva a intentar mas tarde o contacte con el administrador.`,
-            detalle: `${error.message}`
-        });
+        processesErrors(res, error);
     }
 })
 
@@ -268,7 +263,7 @@ router.get('/products', passportCall("current"), async (req, res) => {
     }
 
     if (!sort) {
-        //console.log(`orden no definida: ${sort}`);
+
     } else {
         let criteriosSep = sort.split(',');
 
@@ -289,7 +284,8 @@ router.get('/products', passportCall("current"), async (req, res) => {
     try {
         if (!query) {
             //console.log('Busqueda general');
-            prodss = await ProductsManagerMongoDB.getProductsPaginate(page, limit, cSort);
+            //prodss = await ProductsManager.getProductsPaginate(page, limit, cSort);
+            prodss = await productsService.getProductsPaginate(page, limit, cSort);
         } else {
             //console.log('Busqueda por criterio');
             // Criterio de busqueda con base en el tipo de filtro
@@ -305,7 +301,8 @@ router.get('/products', passportCall("current"), async (req, res) => {
                 searchCriteria = { stock: query }; // Insensible a mayus/minus
             }
 
-            prodss = await ProductsManagerMongoDB.getProductsPaginate(page, limit, cSort, searchCriteria);
+            //prodss = await ProductsManager.getProductsPaginate(page, limit, cSort, searchCriteria);
+            prodss = await productsService.getProductsPaginate(page, limit, cSort, searchCriteria);
 
             if (prodss.docs.length === 0) {
                 dataObject = {
@@ -365,7 +362,6 @@ router.get('/products', passportCall("current"), async (req, res) => {
         };
 
     } catch (error) {
-        console.log(error);
 
         dataObject = {
             status: 'error',
@@ -373,11 +369,7 @@ router.get('/products', passportCall("current"), async (req, res) => {
             errorDetails: error.message
         };
 
-        res.setHeader('Content-type', 'application/json');
-        return res.status(500).json({
-            error: `Error inesperado en el servidor, vuelva a intentar mas tarde o contacte con el administrador.`,
-            detalle: `${error.message}`
-        });
+        processesErrors(res, error);
     }
     res.setHeader('Content-type', 'text/html');
     res.status(200).render("index", {
@@ -408,7 +400,6 @@ router.get('/realtimeproducts', passportCall("current"), auth(['global', 'extern
             status: 'error',
             message: 'Tipo de búsqueda inválido.'
         };
-        //console.log(`${dataObject.status}: ${dataObject.message} `);
 
         // Retornar un error 400 (Bad Request) indicando que el tipo no es valido
         res.setHeader('Content-type', 'application/json');
@@ -445,7 +436,8 @@ router.get('/realtimeproducts', passportCall("current"), auth(['global', 'extern
     try {
         if (!query) {
             //console.log('Busqueda general');            
-            prodss = await ProductsManagerMongoDB.getProductsPaginate(page, limit, cSort);
+            //prodss = await ProductsManager.getProductsPaginate(page, limit, cSort);
+            prodss = await productsService.getProductsPaginate(page, limit, cSort);
         } else {
             //console.log('Busqueda por criterio');
             // Criterio de busqueda con base en el tipo de filtro
@@ -461,7 +453,8 @@ router.get('/realtimeproducts', passportCall("current"), auth(['global', 'extern
                 searchCriteria = { stock: query }; // Insensible a mayus/minus
             }
 
-            prodss = await ProductsManagerMongoDB.getProductsPaginate(page, limit, cSort, searchCriteria);
+            //prodss = await ProductsManager.getProductsPaginate(page, limit, cSort, searchCriteria);
+            prodss = await productsService.getProductsPaginate(page, limit, cSort, searchCriteria);
 
             if (prodss.docs.length === 0) {
                 dataObject = {
@@ -521,7 +514,6 @@ router.get('/realtimeproducts', passportCall("current"), auth(['global', 'extern
         };
 
     } catch (error) {
-        console.log(error);
 
         dataObject = {
             status: 'error',
@@ -529,11 +521,7 @@ router.get('/realtimeproducts', passportCall("current"), auth(['global', 'extern
             errorDetails: error.message
         };
 
-        res.setHeader('Content-type', 'application/json');
-        return res.status(500).json({
-            error: `Error inesperado en el servidor, vuelva a intentar mas tarde o contacte con el administrador.`,
-            detalle: `${error.message}`
-        });
+        processesErrors(res, error);
     }
     res.setHeader('Content-type', 'text/html');
     res.status(200).render("realTimeProducts", {
@@ -551,13 +539,7 @@ router.get("/current",
             res.setHeader('Content-type', 'application/json');
             return res.status(200).json({ user: req.user });
         } catch (error) {
-            console.error("Error en el endpoint /current:", error);
-
-            res.setHeader('Content-type', 'application/json');
-            return res.status(500).json({
-                error: "Error inesperado en el servidor.",
-                detalle: error.message
-            });
+            processesErrors(res, error);
         }
     });
 

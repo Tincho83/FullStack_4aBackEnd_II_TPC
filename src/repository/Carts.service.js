@@ -10,9 +10,6 @@ class CartsService {
 
     // 1.Obtener todos los carritos
     async getCarts() {
-        console.log("... Carts Service");
-        //return await this.cartsDAO.getCarts();
-
         let carts = await this.cartsDAO.getCarts();
 
         if (Array.isArray(carts)) {
@@ -28,10 +25,6 @@ class CartsService {
 
     // 2.Obtener carrito por id y sus productos
     async getCartBy(filter = {}) {
-       
-        console.log("... Cart Service");
-        // return await this.cartsDAO.getCartBy(filter);
-
         let cart = await this.cartsDAO.getCartBy(filter);
 
         if (Array.isArray(cart)) {
@@ -46,10 +39,6 @@ class CartsService {
     
     // 2b.Obtener carrito por id y sus productos (Sin Populate)
     async getCartsBy(filter = {}) {
-       
-        console.log("... Cart Service");
-        // return await this.cartsDAO.getCartsBy(filter);
-
         let cart = await this.cartsDAO.getCartsBy(filter);
 
         if (Array.isArray(cart)) {

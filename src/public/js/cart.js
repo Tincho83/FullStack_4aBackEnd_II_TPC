@@ -40,3 +40,37 @@ function updateSubtotal() {
 function ViewProduct(pid) {    
     window.location.href = `/products/${pid}`;
 }
+
+// Funcion para realizar la compra del carrito
+async function CartPurchase(cartId) {
+    const response = await fetch(`/api/carts/${cartId}/purchase`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    });
+    if (response.status >= 400) {
+        let { error } = await response.json();
+        alert(error);
+    }
+
+    if (response.ok) {
+        const result = await response.json();
+  
+        const ticketCode = result.ticket.code;
+        const ticketMail = result.ticket.purchaser;
+        //const ticketCode = result.code;
+        //const ticketMail = result.purchaser;
+
+        const mySwal = Swal.fire('Compra realizada',
+            `Tu compra con ticket ${ticketCode} se ha realizado con exito. se envia al mail "${ticketMail}" el detalle de la compra`,
+            'success');
+        setTimeout(() => {
+            mySwal.close();
+            window.location.href = `/carts/${cartId}`; // Reemplaza con la URL deseada
+        }, 5000);
+
+    } else {
+        const errorResult = await response.json();
+        Swal.fire('Error en la compra', errorResult.error || 'No se pudo realizar la compra', 'error');
+    }
+
+}

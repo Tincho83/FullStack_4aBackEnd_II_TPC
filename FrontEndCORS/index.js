@@ -1,13 +1,12 @@
 const divConsultas = document.querySelector("#divConsultas");
 const btnConsultas = document.querySelector("#btnConsultas");
 
-console.log("Inicio: FrondEnd Test");
+
 
 btnConsultas.addEventListener("click", async (e) => {
     e.preventDefault();
     divConsultas.textContent = "Cargando datos...";
 
-    console.log("Inicio: Clic Boton");
 
     try {
         const respuesta = await fetch("http://localhost:8080/api/users");
@@ -19,7 +18,7 @@ btnConsultas.addEventListener("click", async (e) => {
         }
 
         const datos = await respuesta.json();
-        //const resp = datos.resp || datos; // Ajuste según la estructura de datos
+
         const users = datos.users; // Accede al array de usuarios en datos.users
 
         if (!Array.isArray(users)) {
@@ -36,7 +35,6 @@ btnConsultas.addEventListener("click", async (e) => {
             divConsultas.appendChild(document.createElement("hr"));
         });
 
-        console.log("Concluido: Clic Boton");
     } catch (error) {
         console.error("Error de conexión o en la solicitud:", error);
         divConsultas.textContent = "Error de conexión o en la solicitud.";
@@ -44,5 +42,4 @@ btnConsultas.addEventListener("click", async (e) => {
 
 });
 
-console.log("Concluido: FrondEnd Test");
 

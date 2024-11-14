@@ -1,6 +1,4 @@
 const { isValidObjectId } = require("mongoose");
-const UsersManager = require("../dao/db/UsersManagerMongoDB");
-const { UsersModel } = require("../dao/models/UsersModel.js");
 const { usersService } = require("../repository/Users.service");
 const { processesErrors } = require("../utils/utils");
 
@@ -8,9 +6,6 @@ class UsersController {
 
     static getUsers = async (req, res) => {
         try {
-            console.log("... User Controller");
-            //let users = await UsersModel.find();
-            //let users = await UsersManager.getUsersDBMongo();
             let users = await usersService.getUsers();
 
             res.setHeader('Content-type', 'application/json');
@@ -19,15 +14,12 @@ class UsersController {
         } catch (error) {
             console.log("Imposible obtener usuarios desde la BBDD. " + error);
             processesErrors(res, error);
-            //res.status(500).send({ status: 'error', message: error.message });
         }
     }
 
     static getUser = async (req, res) => {
 
         let { userid } = req.params;
-        console.log("req.params.userid: ", req.params.userid);
-        console.log("id: ", userid);
 
         if (!isValidObjectId(userid)) {
             res.setHeader('Content-type', 'application/json');
@@ -73,18 +65,12 @@ class UsersController {
             return res.status(201).json({ result });
             //res.send({ status: 'success', payload: result });
         } catch (error) {
-            console.log(error);
-
-            res.setHeader('Content-type', 'application/json');
-            return res.status(500).json({
-                error: `Error inesperado en el servidor, vuelva a intentar mas tarde o contacte con el administrador.`,
-                detalle: `${error.message}`
-            });
+            processesErrors(res, error);
         }
     }
 
     static updateUser = async (req, res) => {
-        //const userid = req.params.userid;
+
         let { userid } = req.params;
         const { first_name, last_name, email, age, role, password } = req.body;
 
@@ -94,7 +80,7 @@ class UsersController {
         }
 
         try {
-            //const user = await UsersModel.findOne({ _id: userid });
+     
             let user = await usersService.getUserBy({ _id: userid });
             if (!user) throw new Error('User not found');
 
@@ -107,7 +93,7 @@ class UsersController {
                 email: email ?? user.email
             }
 
-            //const updateUser = await UsersModel.updateOne({ _id: userid }, newUser);
+       
             const updateUser = await usersService.updateUser({ _id: userid }, newUser);
             res.send({ status: 'success', payload: updateUser });
         } catch (error) {
@@ -116,7 +102,7 @@ class UsersController {
     }
 
     static deleteUser = async (req, res) => {
-        //const userid = req.params.userid;
+      
         let { userid } = req.params;
 
         if (!isValidObjectId(userid)) {
@@ -132,7 +118,7 @@ class UsersController {
 
 
         try {
-            //const result = await UsersModel.deleteOne({ _id: userid });
+         
             const result = await usersService.deleteUser({ _id: userid });
             res.status(200).send({ status: 'success', payload: result });
         } catch (error) {

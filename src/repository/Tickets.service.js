@@ -7,7 +7,6 @@ class TicketsService {
     }
 
     async getTickets() {
-        console.log("... Tickets Service");
         return await this.ticketsDAO.getTickets();
     }
 
@@ -16,9 +15,6 @@ class TicketsService {
     }
 
     async createTicket(ticketData) {
-    //async createTicket(purchaser, amount) {
-        // const ticketData = { purchaser, amount };
-        //return await TicketsRepository.createTicket(ticketData);
         return await this.ticketsDAO.createTicket(ticketData);
     }
 

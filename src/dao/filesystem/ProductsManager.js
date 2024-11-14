@@ -1,5 +1,4 @@
 const fs = require("fs");
-const { ProductsModel } = require("../models/ProductsModel.js");
 
 class ProductsManager {
 
@@ -17,7 +16,7 @@ class ProductsManager {
     }
 
     static async addProduct(prod = {}) {
-        console.log("FS");
+
         let prods = await this.getProducts();
 
         let id = 1;
@@ -69,32 +68,6 @@ class ProductsManager {
 
         return precant - postcant;
     }
-
-    //Para DB
-    /*
-    static async getProductsDBMongo() {
-        return await ProductsModel.find().lean();
-    }
-
-    static async getProductsByIdDBMongo(filter = {}) {
-        return await ProductsModel.findOne(filter).lean();
-    }
-
-    static async addProductDBMongo(product) {
-        let prodNew = await ProductsModel.create();
-        return prodNew.toJSON();
-    }
-
-    static async updateProductDBMongo(id, product) {      
-        return await ProductsModel.findByIdAndUpdate(id, product, {new:true}).lean();
-    }
-
-    static async deleteProductDBMongo(id) {
-        return await ProductsModel.findByIdAndDelete(id, {new:true});
-    }
-*/
-
-
 }
 
 module.exports = ProductsManager;

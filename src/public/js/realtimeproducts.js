@@ -79,7 +79,6 @@ btnSubmit.addEventListener("click", async (e) => {
 
 function ModifyProduct(_id, title, description, code, price, stock, category) {
 
-    //console.log("prod: ", _id, title, description, code, price, stock, category);
     addstatus = false;
 
 
@@ -190,7 +189,7 @@ socket.on("HoraServidor", datosrecib => {
 });
 
 socket.on("nuevoProducto", nuevoProd => {
-    console.log("RT JS escucha:", nuevoProd)
+
     agregarProductoAlDOM(nuevoProd);
 });
 
@@ -268,7 +267,7 @@ function actualizarProductoEnDOM(product) {
             btnModify.setAttribute('onclick', `ModifyProduct('${product._id}', '${product.title}', '${product.description}', '${product.code}', ${product.price}, ${product.stock}, '${product.category}')`);
         }
     } else {
-        //console.log("Producto no encontrado en el DOM");
+
     }
 }
 
@@ -287,9 +286,6 @@ function eliminarProductoDelDOM(productId) {
 // Funcion para agregar producto al carrito
 async function AddProducttoCart(productId) {
 
-    // Obtener Cartid desde LocalStorage IdCart
-    //let cartId = localStorage.getItem("IdCart");
-
     // Obtener CartId desde Cookie 'cartUser'
     let cartId = getCookie("cartUser");
 
@@ -302,36 +298,6 @@ async function AddProducttoCart(productId) {
         });
         return;
 
-
-
-        // Si no hay carrito en localStorage, creamos uno nuevo
-        /*
-        try {
-            const response = await fetch('/api/carts', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            if (!response.ok) {
-                throw new Error('Error al crear el carrito');
-            }
-
-            const newCart = await response.json();
-            cartId = newCart.cartnuevo._id;
-
-            // Guardamos el nuevo carrito en localStorage
-            localStorage.setItem("IdCart", cartId);
-        } catch (error) {
-            console.error("Error al crear un nuevo carrito: ", error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'No se pudo crear un carrito nuevo.'
-            });
-            return;        
-        }
-        */
     }
 
     // Validar los ID

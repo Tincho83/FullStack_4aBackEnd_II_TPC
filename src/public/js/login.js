@@ -53,7 +53,7 @@ btnSubmit.addEventListener("click", async (event) => {
     if (respuesta.status >= 400) {
         alert("Credenciales Invalidas.");
         let { error } = await respuesta.json();
-        console.log("login_js: error: ", error);
+        console.log("error: ", error);
         //alert(respuesta.error);
     } else {
 

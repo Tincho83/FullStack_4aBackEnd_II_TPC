@@ -19,20 +19,13 @@ btnSubmit.addEventListener("click", async (event) => {
     let password = passw.value;
     let age = aged.value;
 
-    //let role = "user";
-
-    // || !role
-   
+  
 
     if (!first_name || !last_name || !email || !age || !password) {
         alert('Complete Datos');
         return;
     }
 
-
-    // if (!role) { role = "user"; }
-
-    // role,
     let body = { first_name, last_name, email, age, password }
 
     let cookieFirm = {

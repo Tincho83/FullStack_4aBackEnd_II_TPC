@@ -1,7 +1,4 @@
 const { isValidObjectId } = require("mongoose");
-const CartsManager = require("../dao/db/CartsManagerMongoDB");
-const { CartsModel } = require("../dao/models/CartsModel.js");
-const { TicketsModel } = require("../dao/models/TicketsModel");
 const { cartsService } = require("../repository/Carts.service");
 const { productsService } = require("../repository/Products.service");
 const { ticketsService } = require("../repository/Tickets.service");
@@ -17,10 +14,8 @@ class CartsController {
     static getCarts = async (req, res) => {
 
         try {
-            //let carts = await CartsManagerMongoDB.getCartsDBMongo();
             let carts = await cartsService.getCarts();
 
-            //console.log(`Se encontraron ${carts.length} carritos.`);
             res.setHeader('Content-type', 'application/json');
             return res.status(200).json({ carts })
         } catch (error) {
@@ -39,12 +34,8 @@ class CartsController {
             return res.status(400).json({ error: `id: ${cid} no valido,` })
         }
 
-        console.log("cid: ", cid);
-
-
         try {
             // Llamamos al metodo con populate para obtener los datos completos de los productos
-            //let cart = await CartsManagerMongoDB.getCartByDBMongo(cid);
             let cart = await cartsService.getCartBy(cid);
             if (!cart) {
                 res.setHeader('Content-type', 'application/json');
@@ -63,7 +54,7 @@ class CartsController {
     // 3.Agregar carrito
     static createCart = async (req, res) => {
         try {
-            //let cartnuevo = await CartsManagerMongoDB.addCartDBMongo();        
+
             let cartnuevo = await cartsService.createCart();
             res.setHeader('Content-type', 'application/json');
             return res.status(200).json({ cartnuevo });
@@ -84,14 +75,12 @@ class CartsController {
         }
 
         try {
-            //const cart = await CartsManagerMongoDB.getCartByDBMongo(cid);
             const cart = await cartsService.getCartBy(cid);
             if (!cart) {
                 res.setHeader('Content-Type', 'application/json');
                 return res.status(400).json({ error: `Carrito inexistente ${cid}` });
             }
 
-            //const product = await ProductsManagerMongoDB.getProductsByDBMongo({ _id: pid });
             const product = await productsService.getProductBy({ _id: pid });
             if (!product) {
                 res.setHeader('Content-Type', 'application/json');
@@ -107,7 +96,6 @@ class CartsController {
                 cart.products[indexProduct].quantity++;
             }
 
-            //let resultado = await CartsManagerMongoDB.updateCartsDBMongo(cid, cart);
             let resultado = await cartsService.addProdToCart(cid, cart);
             if (resultado.modifiedCount > 0) {
                 res.setHeader('Content-type', 'application/json');
@@ -136,36 +124,31 @@ class CartsController {
 
         try {
             // Obtener el carrito actual
-            //let cart = await CartsManagerMongoDB.getCartByDBMongo(cid);
             let cart = await cartsService.getCartBy(cid);
             if (!cart) {
-                //console.log(`Carrito NO encontrado ${cart}`);
                 res.setHeader('Content-type', 'application/json');
                 return res.status(404).json({ error: `Carrito no encontrado con ID: ${cid}` });
             }
-            //console.log(`Carrito encontrado ${JSON.stringify(cart, null, 5)}`);
 
 
             // Filtrar los productos para eliminar el producto especificado
             const updatedProducts = cart.products.filter(item => item.product._id.toString() !== pid);
             // Si no se modifica nada, es porque el producto no estaba en el carrito
             if (updatedProducts.length === cart.products.length) {
-                //console.log(`Producto con ID: ${pid} no encontrado en el carrito.`);
+
                 res.setHeader('Content-type', 'application/json');
                 return res.status(404).json({ error: `Producto con ID: ${pid} no encontrado en el carrito.` });
             }
 
             // Actualizar el carrito con la nueva lista de productos
             cart.products = updatedProducts;
-            //let prodDelete = await CartsManagerMongoDB.updateCartDBMongo(cid, cart);
+
             let prodDelete = await cartsService.updateProdToCart(cid, cart);
 
             if (!prodDelete) {
                 res.setHeader('Content-type', 'application/json');
                 return res.status(400).json({ error: `No se pudo eliminar el producto id: ${cid}` })
             } else {
-                //console.log(`Producto con ID: ${pid} eliminado del carrito con ID: ${cid}`)
-
                 req.socket.emit("ProductoBorrado", pid);
                 console.log("Evento *ProductoBorrado* emitido");
 
@@ -196,7 +179,6 @@ class CartsController {
 
         try {
             // Verificar si el carrito existe
-            //const cart = await CartsManagerMongoDB.getCartByDBMongo(cid);
             let cart = await cartsService.getCartBy(cid);
             if (!cart) {
                 res.setHeader('Content-type', 'application/json');
@@ -210,9 +192,6 @@ class CartsController {
                     return res.status(400).json({ error: `ID de producto no válido: ${product.product}` });
                 }
 
-                console.log("prodssx:", product);
-
-                //const existingProduct = await ProductsModel.findById(product.product).lean();
                 let existingProduct = await productsService.getProductById(product.product);
                 if (!existingProduct) {
                     res.setHeader('Content-type', 'application/json');
@@ -222,9 +201,8 @@ class CartsController {
 
             // Actualizar el carrito con los nuevos productos
             cart.products = productsToUpdate;
-            console.log("productsToUpdate:", productsToUpdate);
+
             // Actualizar el carrito en la base de datos
-            //const updatedCart = await CartsManagerMongoDB.updateCartDBMongo(cid, cart);
             const updatedCart = await cartsService.updateProdToCart(cid, cart);
 
             if (!updatedCart) {
@@ -260,14 +238,13 @@ class CartsController {
 
         try {
             // Verificar si el carrito existe en la base de datos
-            //const cart = await CartsManagerMongoDB.getCartByDBMongo(cid);
             const cart = await cartsService.getCartBy(cid);
             if (!cart) {
                 res.setHeader('Content-type', 'application/json');
                 return res.status(404).json({ error: `Carrito no encontrado con ID: ${cid}` });
             }
             // Verificar si el producto existe en la base de datos
-            //const product = await ProductsManagerMongoDB.getProductsByDBMongo({ _id: pid });            
+
             const product = await productsService.getProductBy({ _id: pid });
             if (!product) {
                 res.setHeader('Content-type', 'application/json');
@@ -283,7 +260,6 @@ class CartsController {
             }
 
             // Guardar el carrito actualizado
-            //const updatedCart = await CartsManagerMongoDB.updateCartDBMongo(cid, cart);
             const updatedCart = await cartsService.updateProdToCart(cid, cart);
 
 
@@ -301,10 +277,7 @@ class CartsController {
 
         } catch (error) {
             console.error(error);
-            return res.status(500).json({
-                error: "Error inesperado en el servidor. Intente más tarde.",
-                detalle: error.message
-            });
+            processesErrors(res, error);
         }
     }
 
@@ -318,7 +291,6 @@ class CartsController {
 
         try {
             // Buscar el carrito en la base de datos
-            //const cart = await CartsManagerMongoDB.getCartByDBMongo(cid);
             const cart = await cartsService.getCartBy(cid);
             if (!cart) {
                 res.setHeader('Content-type', 'application/json');
@@ -329,9 +301,7 @@ class CartsController {
             cart.products = [];
 
             // Guardar el carrito actualizado
-            //const updatedCart = await CartsManagerMongoDB.updateCartDBMongo(cid, cart);
             const updatedCart = await cartsService.updateProdToCart(cid, cart);
-            //console.log("Carrito actualizado a vacio: ", updatedCart);
 
             if (!updatedCart) {
                 res.setHeader('Content-type', 'application/json');
@@ -350,23 +320,12 @@ class CartsController {
 
     static purchaseCart = async (req, res) => {
 
-        console.log("************************************Purchase");
-
         // Validar Carrito
         const { cid } = req.params;
         if (!isValidObjectId(cid)) {
             res.setHeader('Content-type', 'application/json');
             return res.status(400).json({ error: `Carrito id: ${cid} no valido,` })
         }
-
-        /*
-      // validado con mioddleware para que si pueda el rol admin poder hacer mod de un carrito ajeno
-      if (req.user.cartid != cid) {
-          res.setHeader('Content-Type', 'application/json');
-          return res.status(400).json({ error: `El cart que quiere comprar no pertenece al usuario autenticado` })
-      }
-        */
-
 
         //Obtener carrito desde la BBDD, si se encuentra sigue, caso contrario sale.
         try {
@@ -414,13 +373,6 @@ class CartsController {
                 }
             }
 
-            console.log("*req.user: ", req.user);
-            console.log("*cid: ", cid);
-            console.log("*req.user.cart: ", req.user.cartid);
-            console.log("*cart: ", cart);
-            console.log("prodconStock: ", prodconStock);
-            console.log("prodsinStock: ", prodsinStock);
-
             // Si no hay productos con stock suficiente
             if (prodconStock.length == 0) {
                 res.setHeader("Content-Type", "application/json");
@@ -440,11 +392,11 @@ class CartsController {
 
             let tcode = `TCKT-${datePart}-${randomPart}`;
             let tamount = prodconStock.reduce((acum, item) => acum += item.subtotal, 0);
-
-            //const ticket = await TicketsModel.create({ code: `TCKT-${datePart}-${randomPart}`, purchase_datetime: new Date(), amount: prodconStock.reduce((acum, item) => acum += item.subtotal, 0), purchaser: req.user.email, });
+       
             const ticket = await ticketsService.createTicket({ code: tcode, purchase_datetime: new Date(), amount: tamount, purchaser: req.user.email });
 
-            console.log("*ticket: ", ticket);
+            console.log(`ticket: ${ticket.code}
+Productos sin stock: ${prodsinStock.map(p => p.product._id)} `);
 
             // Actualizar carrito del usuario solo con productos sin stock
             cart.products = prodsinStock;
@@ -459,40 +411,40 @@ class CartsController {
 
 
 
-// ***********************************
+            // ***********************************
 
-        // Configuración del transporte de Nodemailer
-        const transporter = nodemailer.createTransport({
-            service: 'gmail', 
-            port: 587,
-            auth: {
-                user: config.GMAIL_ACCOUNT,
-                pass: config.GMAIL_CODE
-            }
-        });
+            // Configuración del transporte de Nodemailer
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                port: 587,
+                auth: {
+                    user: config.GMAIL_ACCOUNT,
+                    pass: config.GMAIL_CODE
+                }
+            });
 
-        // Configuración del correo
-        const mailOptions = {
-            from: config.GMAIL_ACCOUNT,
-            to: req.user.email,
-            subject: "Confirmación de Compra",
-            html: `
+            // Configuración del correo
+            const mailOptions = {
+                from: config.GMAIL_ACCOUNT,
+                to: req.user.email,
+                subject: "Confirmación de Compra",
+                html: `
                 <h1>Gracias por tu compra</h1>
                 <p>Tu ticket de compra es: ${ticket.code}</p>
                 <p>Total pagado: $${tamount.toFixed(2)}</p>
                 ${error ? `<p>Algunos productos no pudieron comprarse debido a falta de stock:</p>
                 <ul>${prodsinStock.map(item => `<li>${item.product._id}</li>`).join('')}</ul>` : ''}
             `
-        };
+            };
 
-        // Enviar el correo
-        await transporter.sendMail(mailOptions);
+            // Enviar el correo
+            await transporter.sendMail(mailOptions);
 
-// *****************************
+            // *****************************
 
             // enviar un mail
             // try {
-          
+
             // } catch (error) {
 
             // }
@@ -502,7 +454,7 @@ class CartsController {
                 return res.status(200).json({
                     ticket,
                     alerta: `Atencion: algún/os ítem/s no se pudieron procesar por falta de stock al momento de la compra.
-                             Intente comprar los productos restantes mas tarde o llamemos.`,
+Intente comprar los productos restantes mas tarde o llamemos.`,
                     "Prods_sin_Stock": prodsinStock.map(p => p.product._id)
                 });
             } else {

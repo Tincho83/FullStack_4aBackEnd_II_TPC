@@ -5,48 +5,29 @@ class UsersManagerMongoDB {
 
     //*Obtener Users
     static async getUsers() {
-        console.log("... User DAO");
+
         return await UsersModel.find().lean();
     }
 
     static async getUserBy(filter = {}) { //{ key:"value", key2: "value" }
         return await UsersModel.findOne(filter).lean();
     }
-
     
     //*Agregar Users a la BBDD
     static async addUser(User) {
         let userNew = await UsersModel.create(User);
         return userNew.toJSON();
     }
-    /*
-    static async addUsersDBMongo(User) {
-        let prodNew = await UsersModel.create(User);
-        return prodNew.toJSON();
-    }
-    */
-
 
     //*Actualizar User desde id con User con valores
     static async updateUser(id, User) {
         return await UsersModel.findByIdAndUpdate(id, User, { new: true }).lean();
     }
-    /*
-    static async updateUserDBMongo(id, User) {
-        return await UsersModel.findByIdAndUpdate(id, User, { new: true }).lean();
-    }
-    */
 
     //Borrar User de la BBDD
     static async deleteUser(id) {
         return await UsersModel.findByIdAndDelete(id, { new: true }).lean();
     }
-    /*
-    static async deleteUserDBMongo(id) {
-        return await UsersModel.findByIdAndDelete(id, { new: true }).lean();
-    }
-    */
-
 
     //*Obtener Users por credenciales
     static async getUserCredencialesDBMongo(email, password) {
@@ -64,15 +45,11 @@ class UsersManagerMongoDB {
         return await UsersModel.paginate(searchCriteria, { page: page, limit: limit, sort: sort, lean: true });
     }
 
-
-
     //Obtener cart por id
     static async getUserByIDDBMongo(id) {
         return await UsersModel.findOne({ _id: id }).lean();
-        //return await UsersModel.findOne({ _id: id }).populate('products.product').lean();
     }
 
 }
 
-//module.exports = UsersManagerMongoDB;
 module.exports = { UsersManagerMongoDB };

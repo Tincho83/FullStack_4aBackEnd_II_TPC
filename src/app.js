@@ -58,13 +58,9 @@ app.set('views', rutaviews);
 
 app.use("/api/products",
     (req, res, next) => {
-        console.log("app.js: app.use products");
-        //Singleton.conectarDB(config.MONGO_URL, config.MONGO_DBNAME);
         req.socket = serverSocket;       
         next();
-        //}, passport.authenticate("current", { session: false }), productsRouter);
     }, passportCall("current"), auth(['global', 'external']), productsRouter);
-//para passportCall: passportCall("current"), productsRouter); 
 
 app.use("/api/carts/", cartsRouter);
 
@@ -134,27 +130,3 @@ serverSocket.on('connection', (socket) => {
         console.log(`Cliente desconectado: ${socket.id}`);
     });
 });
-
-// Funcion para conectarse a la BBDD.
-//connDB();
-//ConnectDB.conectarDB(config.MONGO_URL, config.MONGO_DBNAME);
-
-
-
-
-//Singleton.conectarDB(dburl, dbname);
-//Singleton.conectar(dburl, dbname);
-//SingletonMongoDB.conectarDB( dburl, dbname );
-//const mongoInstance = SingletonMongoDB.conectarDB();
-//const mongoInstancearg = SingletonMongoDB.conectarDB(dburl, dbname);  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-//const mongoInstancearg2 = SingletonMongoDB.conectarDB(dburl, dbname); >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-/*
-(async () => {
-    try {
-        await SingletonMongoDB.conectarDB();
-    } catch (error) {
-        console.error("No se pudo conectar a la base de datos, terminando el proceso.");
-        process.exit(1);
-    }
-})();
-*/

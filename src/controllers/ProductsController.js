@@ -1,7 +1,6 @@
 const { isValidObjectId } = require("mongoose");
-const ProductsManager = require("../dao/db/ProductsManagerMongoDB");
-const { ProductsModel } = require("../dao/models/ProductsModel.js");
 const { productsService } = require("../repository/Products.service");
+const { processesErrors } = require("../utils/utils");
 
 
 class ProductsController {
@@ -35,7 +34,7 @@ class ProductsController {
         }
 
         if (!sort) {
-            //console.log(`orden no definida: ${sort}`);
+
         } else {
             let criteriosSep = sort.split(',');
 
@@ -54,12 +53,9 @@ class ProductsController {
 
         try {
             if (!query) {
-                //console.log('Busqueda general');
-                //prodss = await ProductsManager.getProductsDBMongoPaginate(page, limit, cSort);
-                //prodss = await ProductsManager.getProductsDBMongoPaginate(page, limit, cSort);
                 prodss = await productsService.getProductsPaginate(page, limit, cSort);
+                                               
             } else {
-                //console.log('Busqueda por criterio');
                 // Criterio de busqueda con base en el tipo de filtro
                 if (type === 'category') {
                     searchCriteria = { category: new RegExp(query, 'i') };
@@ -73,9 +69,8 @@ class ProductsController {
                     searchCriteria = { stock: query }; // Insensible a mayus/minus
                 }
 
-                //prodss = await ProductsManagerMongoDB.getProductsDBMongoPaginate(page, limit, cSort, searchCriteria);
                 prodss = await productsService.getProductsPaginate(page, limit, cSort, searchCriteria);
-
+                console.log('Resultado de prods:', prodss);
 
                 if (prodss.docs.length === 0) {
                     dataObject = {
@@ -125,28 +120,20 @@ class ProductsController {
                 prevPage: prodss.prevPage,
                 nextPage: prodss.nextPage,
                 page: prodss.page,
-                //pageLink: pageLink,
                 hasPrevPage: prodss.hasPrevPage,
                 hasNextPage: prodss.hasNextPage,
                 prevLink: prevLink,
                 nextLink: nextLink,
-                //lastLink: lastLink,
-                //hasLastPage: showLastPage
             };
 
         } catch (error) {
-            console.log(error);
 
             dataObject = {
                 status: 'error',
                 message: 'Error inesperado en el servidor, vuelva a intentar mas tarde o contacte con el administrador.'
             };
 
-            res.setHeader('Content-type', 'application/json');
-            return res.status(500).json({
-                error: `Error inesperado en el servidor, vuelva a intentar mas tarde o contacte con el administrador.`,
-                detalle: `${error.message}`
-            });
+            processesErrors(res, error);
         }
         res.setHeader('Content-type', 'application/json');
         return res.status(200).json({ dataObject })
@@ -171,12 +158,7 @@ class ProductsController {
             res.setHeader('Content-type', 'application/json');
             return res.status(200).json({ product })
         } catch (error) {
-            console.log(error);
-            res.setHeader('Content-type', 'application/json');
-            return res.status(500).json({
-                error: `Error inesperado en el servidor, vuelva a intentar mas tarde o contacte con el administrador.`,
-                detalle: `${error.message}`
-            });
+            processesErrors(res, error);
         }
 
     }
@@ -194,7 +176,6 @@ class ProductsController {
             console.log("code: ", code);
             let existe = await productsService.getProductBy({ code })
             if (existe) {
-                //console.log(`Producto ${code} existente en DB.`);
                 res.setHeader('Content-type', 'application/json');
                 return res.status(400).json({ error: `Producto ${code} existente en DB.` })
             }
@@ -208,20 +189,13 @@ class ProductsController {
             return res.status(201).json({ prodNew })
 
         } catch (error) {
-            console.log(error);
-            res.setHeader('Content-type', 'application/json');
-            return res.status(500).json({
-                error: `Erro.r inesperado en el servidor, vuelva a intentar mas tarde o contacte con el administrador.`,
-                detalle: `${error.message}`
-            });
+            processesErrors(res, error);
         }
 
     }
 
     static updateProduct = async (req, res) => {
         let { id } = req.params;
-        console.log("*************** update **************************");
-        console.log("prod id: ", id);
 
         if (!isValidObjectId(id)) {
             res.setHeader('Content-type', 'application/json');
@@ -229,34 +203,19 @@ class ProductsController {
         }
 
         let prodToModify = req.body;
-        console.log("prod modify: ", prodToModify);
-
         
-        //let existingProduct = await ProductsModel.findOne({ _id: id });
         let existingProduct = await productsService.getProductBy({ _id: id });
 
-        console.log("existingProduct: ", existingProduct);
-
-
         if (existingProduct && existingProduct._id.toString() !== id) {
-            console.log("existingProduct if: ", existingProduct);
             res.setHeader('Content-type', 'application/json');
             return res.send({ status: "error", error: "Duplicate ID found" });
         }
 
         // Comprobar si codigo existe en otro producto
         if (prodToModify.code) {
-            //let productWithSameCode = await ProductsModel.findOne({ code: prodToModify.code, _id: { $ne: id } });
             let productWithSameCode = await productsService.getProductBy({ code: prodToModify.code, _id: { $ne: id } });
 
-            console.log("prodToModify if: ", prodToModify);
-            console.log("prodToModify id if: ", id);
-            console.log("prodToModify code if: ", prodToModify.code);
-            console.log("existingProduct if: ", existingProduct);
-            console.log("productWithSameCode if: ", productWithSameCode);
-
             if (productWithSameCode) {
-                //console.log("Producto con código duplicado encontrado:", productWithSameCode);
                 res.setHeader('Content-type', 'application/json');
                 return res.status(400).json({ error: `El código ${prodToModify.code} ya está en uso por otro producto.` });
             }
@@ -276,12 +235,7 @@ class ProductsController {
             return res.status(200).json({ success: `producto actualizado id: ${id}` })
 
         } catch (error) {
-            console.log(error);
-            res.setHeader('Content-type', 'application/json');
-            return res.status(500).json({
-                error: `Error inesperado en el servidor, vuelva a intentar mas tarde o contacte con el administrador.`,
-                detalle: `${error.message}`
-            });
+            processesErrors(res, error);
         }
     }
 
@@ -306,12 +260,7 @@ class ProductsController {
                 return res.status(200).json({ prodDelete })
             }
         } catch (error) {
-            console.log(error);
-            res.setHeader('Content-type', 'application/json');
-            return res.status(500).json({
-                error: `Error inesperado en el servidor, vuelva a intentar mas tarde o contacte con el administrador.`,
-                detalle: `${error.message}`
-            });
+            processesErrors(res, error);
         }
     }
 

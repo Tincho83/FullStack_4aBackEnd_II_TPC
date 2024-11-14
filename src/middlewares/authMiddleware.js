@@ -60,7 +60,6 @@ const auth = (roles = []) => {
 
         //if (!req.user || !req.user?.role) {
         if (!req.user || !req.user.role) {
-            console.log("!role", req.user);
             res.setHeader('Content-Type', 'application/json');
             return res.status(401).json({ error: `No posee permisos. No Autorizado.` });
         }
@@ -70,17 +69,6 @@ const auth = (roles = []) => {
             res.setHeader('Content-Type', 'application/json');
             return res.status(403).json({ error: `No Autorizado a este recurso.` });
         }
-
-        // Verificar que el usuario tiene acceso a su propio carrito
-        //const cartIdInRequest = req.params.cid || req.body.cid;
-
-        //console.log("cartIdInRequest", cartIdInRequest);
-        //console.log("req.user.cartId", req.user.cartid);
-
-        //if (cartIdInRequest && cartIdInRequest !== req.user.cartid) {
-        //    res.setHeader('Content-Type', 'application/json');
-        //    return res.status(403).json({ error: `No tienes permisos para modificar este carrito.` });
-        //}
 
         next();
 

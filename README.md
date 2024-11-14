@@ -1,15 +1,15 @@
 ![image](/src/public/img/demo.PNG)
-# BackEnd II - Entrega TP 
-## _Servidor con endpoints y servicios para gestionar los productos y carritos de compra de un e-commerce integrando vistas Handlebars, websocket y BD._  
+# BackEnd II - Entrega TP Conclusivo 
+## _Servidor con endpoints y servicios para gestionar los productos y carritos de compra de un e-commerce integrando vistas Handlebars, websocket y BD, entre otras tecnicas._  
   
 ### Vista previa / Preview
 ![image](/src/public/img/demo.gif)
 
 ### Depliegue / Deploy
-[BackEnd II Entrega TP3 (Conclusivo)](https://ecommbackend1b.netlify.app/) (No disponible por el momento.)
+[BackEnd II Entrega TP (Conclusivo)](https://ecommbackend1b.netlify.app/) (No disponible por el momento.)
 
 ### Descripcion / Description
-Aplicativo Backend para e-commerce realizado en javascript, express, Handlebars, websocket y BD para el curso de Backend I en CoderHouse.  
+Aplicativo Backend para e-commerce realizado en javascript, express, Handlebars, websocket y BD para el curso de Backend II Arquitectura en CoderHouse.  
 
 
 ### Construccion / Building
@@ -22,13 +22,27 @@ Aplicativo Backend para e-commerce realizado en javascript, express, Handlebars,
    - npm --version
 
 ### Dependecias / Dependencies
+-  bcrypt
+-  commander
+-  connect-mongo
+-  cookie-parser
+-  cors
+-  dotenv
 -  express
 -  express-handlebars
--  socket.io
+-  express-session
+-  jsonwebtoken
 -  moment
 -  mongoose
 -  mongoose-paginate-v2
 -  multer
+-  nodemailer
+-  passport
+-  passport-github2
+-  passport-jwt
+-  passport-local
+-  session-file-store
+-  socket.io
 
 ## Instalacion / Installation
 ### Pasos / Steps
@@ -44,13 +58,28 @@ Aplicativo Backend para e-commerce realizado en javascript, express, Handlebars,
 - Instalar todas las dependecias del proyecto/ Install dependencies
    - **npm install**
    o instalar dependencias individualmente
+   - **npm install bcrypt**
+   - **npm install commander**
+   - **npm install connect-mongo**
+   - **npm install cookie-parser**
+   - **npm install cors**
+   - **npm install dotenv**
    - **npm install express**
    - **npm install express-handlebars@7.1.3**
+   - **npm install express-session**
+   - **npm install jsonwebtoken**
    - **npm install moment**
    - **npm install mongoose**
-   - **npm install socket.io**
    - **npm install mongoose-paginate-v2**
    - **npm install multer**
+   - **npm install nodemailer**
+   - **npm install passport**
+   - **npm install passport-github2**
+   - **npm install passport-jwt**
+   - **npm install passport-local**
+   - **npm install session-file-store**
+   - **npm install socket.io**
+
    
 - Instalar otras herramientas / Install others tools
    - **npm install -g nodemon** (instala nodemon de manera global. Esta herramienta reinicia el servidor cuando detecta cambios en el codigo.)

@@ -20,18 +20,18 @@ const processesErrors = (res, error) => {
 
 const passportCall = (controlStrategy) => function (req, res, next) {
     passport.authenticate(controlStrategy, function (err, user, info, status) {
-        console.log("utils.js: passportCall");
+
         if (err) { 
-            console.log("utils.js: passportCall: error:", err);
+
             return next(err)
          }
         if (!user) {
-            console.log("utils.js: passportCall: sin user:", info.toString());
+
             res.setHeader('Content-Type', 'application/json');
             return res.status(401).json({ error: `${info.message ? info.message : info.toString()}` })
         }
         req.user = user;
-        console.log("utils.js: passportCall: user:", req.user);
+
         return next();
     })(req, res, next);
 }

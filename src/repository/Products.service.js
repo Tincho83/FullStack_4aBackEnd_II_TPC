@@ -9,9 +9,6 @@ class ProductsService {
     }
 
     async getProducts() {
-        console.log("... Products Service");
-        //return await this.productsDAO.getProducts();
-
         let Products = await this.productsDAO.getProducts();
 
         if (Array.isArray(Products)) {
@@ -27,15 +24,19 @@ class ProductsService {
     }
 
     async getProductsPaginate(page, limit, sort, searchCriteria) {
-        console.log("... Products Pag Service");
-        //return await this.productsDAO.getProductsPaginate(page, limit, sort, searchCriteria);
-
         let ProductsPag = await this.productsDAO.getProductsPaginate(page, limit, sort, searchCriteria);
 
+        /*
         if (Array.isArray(ProductsPag)) {
             ProductsPag = ProductsPag.map(p => new ProductsDTO(p));
         } else if (ProductsPag) {
             ProductsPag = new ProductsDTO(ProductsPag);
+        }
+*/
+
+        // Comprobar de que docs este antes de aplicarle ProductsDTO
+        if (ProductsPag && Array.isArray(ProductsPag.docs)) {
+            ProductsPag.docs = ProductsPag.docs.map(p => new ProductsDTO(p));
         }
 
         return ProductsPag;
@@ -43,10 +44,6 @@ class ProductsService {
     }
 
     async getProductBy(filter = {}) {
-
-        console.log("... Product Service");
-        //return await this.productsDAO.getProductBy(filter);
-
         let product = await this.productsDAO.getProductBy(filter);
 
         if (Array.isArray(product)) {
@@ -63,20 +60,6 @@ class ProductsService {
     async getProductById(product) {
         return await this.productsDAO.getProductById(product);
     }
-
-    /*
-    async getProductByNombre(nombre) {
-        let prods = await this.productsDAO.get()
-        let prod = prods.find(p => p.code === nombre)
-        return prod
-    }
-
-    async getProductByEmail(email) {
-        let prods = await this.productsDAO.get()
-        let prod = prods.find(p => p.email === email)
-        return prod
-    }
-    */
 
     async addProduct(product) {
         return await this.productsDAO.addProduct(product);

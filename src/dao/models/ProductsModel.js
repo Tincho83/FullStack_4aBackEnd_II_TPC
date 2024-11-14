@@ -23,7 +23,6 @@ const productsSchema = new mongoose.Schema(
     }    
 )
 
-// plugin para usar paginate
 productsSchema.plugin(paginate);
 
 const ProductsModel = mongoose.model(
