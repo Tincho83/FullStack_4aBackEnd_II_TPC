@@ -43,30 +43,3 @@ btnSubmitTokenMail.addEventListener("click", async (event) => {
     }
 
 })
-
-
-btnSubmit.addEventListener("click", async (event) => {
-    event.preventDefault();
-    const token = new URLSearchParams(window.location.search).get('token');
-    let password = passw.value;
-
-    if (!token || !password) {
-        alert('Token or password missing.');
-        return;
-    }
-
-    let body = { token, password };
-
-    let response = await fetch("/api/sessions/resetpassword", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-    });
-
-    let data = await response.json();
-    if (response.status >= 400) {
-        alert(data.error);
-    } else {
-        window.location.href = `/login?message=${data.message}`;
-    }
-});

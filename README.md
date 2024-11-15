@@ -14,7 +14,7 @@ Aplicativo Backend para e-commerce realizado en javascript, express, Handlebars,
 
 ### Construccion / Building
 -  Javascript
--  node
+-  node 19.9
 
 # Install nodejs and verify version
    - Install node (recommended version LTS)

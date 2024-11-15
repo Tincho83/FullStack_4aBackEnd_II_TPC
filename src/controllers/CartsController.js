@@ -162,6 +162,7 @@ class CartsController {
 
     //6.Actualizar carrito desde un arreglo
     static updateCart = async (req, res) => {
+        
         const { cid } = req.params;
         // Validar el ID del carrito
         if (!isValidObjectId(cid)) {
@@ -169,10 +170,10 @@ class CartsController {
             return res.status(400).json({ error: `id: ${cid} no valido,` })
         }
 
-        const productsToUpdate = req.body;
+        const products = req.body;
 
         // Validar que el body contiene un arreglo de productos
-        if (!Array.isArray(productsToUpdate)) {
+        if (!Array.isArray(products)) {
             res.setHeader('Content-type', 'application/json');
             return res.status(400).json({ error: "Se esperaba un arreglo de productos en el body" });
         }
@@ -186,7 +187,7 @@ class CartsController {
             }
 
             // Validar que los productos existen en la base de datos de productos
-            for (let product of productsToUpdate) {
+            for (let product of products) {
                 if (!isValidObjectId(product.product)) {
                     res.setHeader('Content-type', 'application/json');
                     return res.status(400).json({ error: `ID de producto no válido: ${product.product}` });
@@ -200,7 +201,7 @@ class CartsController {
             }
 
             // Actualizar el carrito con los nuevos productos
-            cart.products = productsToUpdate;
+            cart.products = products;
 
             // Actualizar el carrito en la base de datos
             const updatedCart = await cartsService.updateProdToCart(cid, cart);
@@ -454,7 +455,7 @@ Productos sin stock: ${prodsinStock.map(p => p.product._id)} `);
                     alerta: `Atencion: algún/os ítem/s no se pudieron procesar por falta de stock al momento de la compra.
 Intente comprar los productos restantes mas tarde o llamemos.`,
                     "Prods_sin_Stock": prodsinStock.map(p => p.product._id, ),
-                    aviso: response.alert
+                    aviso: response.alerta
                 });
             } else {
                 res.setHeader('Content-Type', 'application/json');
