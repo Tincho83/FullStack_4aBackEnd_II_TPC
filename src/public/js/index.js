@@ -91,8 +91,6 @@ async function AddProducttoCart(productId) {
 
 // Funcion para ver el carrito
 function ViewCart() {
-        // Obtener Cartid desde LocalStorage IdCart
-    //let cartId = localStorage.getItem("IdCart");
 
     // Obtener CartId desde Cookie 'cartUser'
     let cartId = getCookie("cartUser");

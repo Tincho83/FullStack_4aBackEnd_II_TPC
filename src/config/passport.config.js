@@ -8,7 +8,6 @@ const { isValidPassword, createHash } = require("../utils/utils");
 const { CartsModel } = require("../dao/models/CartsModel");
 const { config } = require("./config");
 const { UsersDTO } = require("../dto/UsersDTO");
-//const { UsersManagerMongoDB } = require("../dao/db/UsersManagerMongoDB");
 const { UsersManagerMongoDB: UsersManager } = require("../dao/db/UsersManagerMongoDB");
 const { usersService } = require("../repository/Users.service");
 const { cartsService } = require("../repository/Carts.service");
@@ -47,7 +46,6 @@ const initPassport = () => {
                         }
                     }
 
-                    //let existe = await UsersManager.getUserBy({ email: username });
                     let existe = await usersService.getUserBy({ email: username });
                     if (existe) {
                         return done(null, false, { message: `El usuario ${username} ya existe en la DB.` });
@@ -58,11 +56,9 @@ const initPassport = () => {
 
                     password = createHash(password);
 
-                    //const newCart = await CartsModel.create({});
                     const newCart = await cartsService.createCart({});
                     const cartId = newCart._id;
-
-                    //const newuser = await UsersManager.addUser({ first_name, last_name, email: username, age, password, cart: { Id: cartId } });
+                    
                     const newuser = await usersService.createUser({ first_name, last_name, email: username, age, password, cart: { Id: cartId } });
 
                     return done(null, newuser);
@@ -83,7 +79,6 @@ const initPassport = () => {
             async (username, password, done) => {
                 try {
 
-                    //let existe = await UsersManager.getUserBy({ email: username });
                     let existe = await usersService.getUserByFilter({ email: username });
                     if (!existe) {
                         return done(null, false, { message: `Solo backend Usuario no encontrado.` });
@@ -118,7 +113,7 @@ const initPassport = () => {
                         return done(null, false);
                     }
 
-                    //let usuario = await UsersManager.getUserBy({ email });
+               
                     let usuario = await usersService.getUserByFilter({ email });
                     if (!usuario) {
 
@@ -132,12 +127,12 @@ const initPassport = () => {
                         let yearsDifference = diffInMilliseconds / millisecondsPerYear;
                         let age = Math.floor(yearsDifference);
 
-                        //const newCart = await CartsModel.create({});
+                   
                         const newCart = await cartsService.createCart({});
                         const cartId = newCart._id;
 
 
-                        //usuario = await UsersManager.addUser({ first_name: profile._json.name, last_name: "", email, age: 19, password: "", profileGithub: profile, cart: { Id: cartId } });
+                       
                         usuario = await usersService.addUser({
                             first_name: profile._json.name,
                             last_name: "",
@@ -154,8 +149,6 @@ const initPassport = () => {
                             await usuario.save();
                         }
                     }
-
-                    //let token = jwt.sign(usuario, config.JWT_SECRET, { expiresIn: 1920 }); // expira en 32 min
 
                     return done(null, usuario);
 

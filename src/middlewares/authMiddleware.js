@@ -58,7 +58,7 @@ const auth = (roles = []) => {
             return next();
         }
 
-        //if (!req.user || !req.user?.role) {
+      
         if (!req.user || !req.user.role) {
             res.setHeader('Content-Type', 'application/json');
             return res.status(401).json({ error: `No posee permisos. No Autorizado.` });

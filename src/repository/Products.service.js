@@ -26,14 +26,6 @@ class ProductsService {
     async getProductsPaginate(page, limit, sort, searchCriteria) {
         let ProductsPag = await this.productsDAO.getProductsPaginate(page, limit, sort, searchCriteria);
 
-        /*
-        if (Array.isArray(ProductsPag)) {
-            ProductsPag = ProductsPag.map(p => new ProductsDTO(p));
-        } else if (ProductsPag) {
-            ProductsPag = new ProductsDTO(ProductsPag);
-        }
-*/
-
         // Comprobar de que docs este antes de aplicarle ProductsDTO
         if (ProductsPag && Array.isArray(ProductsPag.docs)) {
             ProductsPag.docs = ProductsPag.docs.map(p => new ProductsDTO(p));

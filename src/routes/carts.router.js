@@ -1,8 +1,5 @@
 const { Router } = require("express");
-//const { isValidObjectId } = require("mongoose");
-
 const passport = require("passport");
-//const jwt = require("jsonwebtoken");
 const { CartsController } = require("../controllers/CartsController.js");
 const auth = require("../middlewares/authMiddleware.js");
 const cartProtectMiddleware = require("../middlewares/cartProtectMiddleware.js");

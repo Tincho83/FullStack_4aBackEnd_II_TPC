@@ -14,7 +14,7 @@ class ProductsManagerMongoDB {
     }
 
     //Obtener products por medio de filtro
-    static async getProductBy(filter = {}) { //{ key:"value", key2: "value" }
+    static async getProductBy(filter = {}) {
         return await ProductsModel.findOne(filter).lean();
     }
 

@@ -122,7 +122,7 @@ function ModifyProduct(_id, title, description, code, price, stock, category) {
             }
 
             if (!updatedProduct.title || !updatedProduct.description || !updatedProduct.code || !updatedProduct.price || !updatedProduct.stock || !updatedProduct.category) {
-            //if (!title || !description || !code || !price || !stock || !category) {
+           
                 alert('Comprobar datos ingresados. Todos los campos son obligatorios.');
                 return;
             }
@@ -361,8 +361,6 @@ async function AddProducttoCart(productId) {
 
 // Funcion para ver el carrito
 function ViewCart() {
-    // Obtener Cartid desde LocalStorage IdCart
-    //let cartId = localStorage.getItem("IdCart");
 
     // Obtener CartId desde Cookie 'cartUser'
     let cartId = getCookie("cartUser");

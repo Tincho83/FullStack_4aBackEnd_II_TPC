@@ -1,9 +1,7 @@
 const { Router } = require("express");
 const { isValidObjectId } = require("mongoose");
 const crypto = require("crypto");
-
-//const { UsersManagerMongoDB } = require("../dao/db/UsersManagerMongoDB");
-const { UsersManagerMongoDB: UsersManager  } = require("../dao/db/UsersManagerMongoDB");
+const { UsersManagerMongoDB: UsersManager } = require("../dao/db/UsersManagerMongoDB");
 const { UsersModel } = require("../dao/models/UsersModel.js");
 const { usersService } = require("../repository/Users.service");
 const { config } = require("../config/config");
@@ -12,7 +10,7 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const { UsersDTO } = require("../dto/UsersDTO");
-
+const nodemailer = require('nodemailer');
 
 const router = Router();
 
@@ -63,8 +61,7 @@ router.get("/error/:codigo(e[0-9]+)/:usuario", (req, res) => {
     res.status(200).send({ message: `Codigo de error recibido: ${req.descriptionError}, por parte de ${usuario}` });
 });
 
-router.post("/signup",
-    // passport.authenticate("signup", { session: false, failureRedirect: "/api/sessions/error" }), // add "session: false" si no se usa sessions
+router.post("/signup",    
     passportCall("signup"),
 
     (req, res) => {
@@ -72,8 +69,7 @@ router.post("/signup",
         return res.status(201).json({ result: "Registro Ok", newuser: req.user });
     });
 
-router.post("/login",
-    //passport.authenticate("login", { session: false, failureRedirect: "/api/sessions/error" }), // add "session: false" si no se usa sessions
+router.post("/login",    
     passportCall("login"),
     (req, res) => {
 
@@ -83,7 +79,7 @@ router.post("/login",
 
             let existe = { ...req.user };
 
-           
+
             let cartid = existe.cartid.toString();
             if (cartid === "Sin_Cart_ID") {
                 console.log(`Usuario: ${existe.email} no tiene un carrito asociado, se recomienda asociar un Cart Id a este usuario o borrar y volver a crear el usuario.`);
@@ -131,7 +127,6 @@ router.put("/resetpassword", async (req, res) => {
     }
 
     try {
-        //let existe = await UsersManager.getUserBy({ email });
         let existe = await usersService.getUserByFilter({ email });
         if (!existe) {
             res.setHeader('Content-type', 'application/json');
@@ -140,8 +135,7 @@ router.put("/resetpassword", async (req, res) => {
 
         password = createHash(password);
 
-        //const result = await UsersManager.updateUser(existe._id, { password });
-        const result = await usersService.updateUser( existe._id, { password } );
+        const result = await usersService.updateUser(existe._id, { password });
 
         res.setHeader('Content-type', 'application/json');
         return res.status(201).json({ result: "Reseteo password Ok", result });
@@ -149,6 +143,111 @@ router.put("/resetpassword", async (req, res) => {
         processesErrors(res, error);
     }
 });
+
+// Config transporte de Nodemailer
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    port: 587,
+    auth: {
+        user: config.GMAIL_ACCOUNT,
+        pass: config.GMAIL_CODE
+    }
+});
+
+router.put("/resetpasswordmail", async (req, res) => {
+
+    const { email } = req.body;
+
+    if (!email) {
+        res.setHeader('Content-type', 'application/json');
+        return res.status(400).json({ status: "error", error: "Email is required." });
+    }
+
+    try {
+        let existe = await usersService.getUserByFilter({ email });
+        if (!existe) {
+            res.setHeader('Content-type', 'application/json');
+            return res.status(400).json({ status: "error", error: "User not found." });
+        }
+
+        const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: 3599 });
+
+        const resetLink = `http://localhost:8080/resetpassword?token=${token}`;
+        await transporter.sendMail({
+            from: config.GMAIL_ACCOUNT,
+            to: email,
+            subject: "Password Reset",
+            html: `
+            <p>Click <a href="${resetLink}">here</a> to reset your password. This link will expire in 1 hour.</p>
+            <p>or</p>
+            <p>Click the button below to reset your password. This link will expire in 1 hour.</p>
+            <a href="${resetLink}" style=" display: inline-block; padding: 10px 20px; font-size: 16px; color: #ffffff;
+            background-color: #007bff; text-decoration: none; border-radius: 5px;">Reset Password</a>
+            <p>If you did not request a password reset, please ignore this email.</p>
+            `
+        });
+
+
+        res.setHeader('Content-type', 'application/json');
+        res.status(200).json({ status: "success", message: "Reset password email sent." });
+    } catch (error) {
+        processesErrors(res, error);
+    }
+});
+
+router.put("/resetpasswordtokenmail", async (req, res) => {
+
+    const { token, password } = req.body;
+
+
+    if (!token || !password) {
+        return res.status(400).json({ status: "error", error: "Token and password are required." });
+    }
+
+    try {
+        // Verificar el token
+        const decoded = jwt.verify(token, config.JWT_SECRET);
+        const { email } = decoded;
+
+
+
+        let user = await usersService.getUserByFilter({ email });
+        if (!user) {
+            return res.status(400).json({ status: "error", error: "User not found." });
+        }
+
+
+
+        // Verificar si la nueva contraseña es la misma que la actual
+        const isSamePassword = isValidPassword(password, user.password);
+
+        if (isSamePassword) {
+
+            res.setHeader('Content-type', 'application/json');
+            return res.status(400).json({ status: "error", error: "New password cannot be the same as the current password. Enter a diferent password.", email });
+        }
+
+        // Actualizar la contraseña
+        const hashedPassword = createHash(password);
+
+
+       
+        const result = await usersService.updateUser(user._id, { password: hashedPassword });
+
+
+        res.setHeader('Content-type', 'application/json');
+        res.status(201).json({ status: "success", message: "Password has been reset. You can now log in with the new password.", result });
+    } catch (error) {
+        if (error.name === 'TokenExpiredError') {
+            res.setHeader('Content-type', 'application/json');
+            res.status(401).json({ status: "error", error: "Token expired. Please request a new password reset link." });
+        } else {
+            processesErrors(res, error);
+        }
+    }
+});
+
+
 
 //Paso 3:
 router.get("/github",
@@ -180,7 +279,7 @@ router.get("/callbackGithub",
         res.cookie("cartUser", cartid, {});
 
 
-            let token = jwt.sign(user, config.JWT_SECRET, { expiresIn: 1920 }); //exp 32min
+        let token = jwt.sign(user, config.JWT_SECRET, { expiresIn: 1920 }); //exp 32min
 
         if (!token) {
             return res.status(500).json({ error: "Token no encontrado." });

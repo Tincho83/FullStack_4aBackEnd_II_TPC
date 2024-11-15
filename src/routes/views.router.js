@@ -5,17 +5,12 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const { fork, exec, spawn } = require("child_process");
 
-//const ProductsManagerMongoDB = require("../dao/db/ProductsManagerMongoDB.js");
-const ProductsManager  = require("../dao/db/ProductsManagerMongoDB.js");
+const ProductsManager = require("../dao/db/ProductsManagerMongoDB.js");
 const { productsService } = require("../repository/Products.service.js");
-//const CartsManagerMongoDB = require("../dao/db/CartsManagerMongoDB.js");
 const CartsManager = require("../dao/db/CartsManagerMongoDB.js");
 const { cartsService } = require("../repository/Carts.service.js");
 const { usersService } = require("../repository/Users.service");
 
-//borrar
-//const ProductsManager = require("../dao/filesystem/ProductsManager.js");
-//const CartsManager = require("../dao/filesystem/CartsManager.js");
 const { config } = require("../config/config");
 const { passportCall } = require("../utils/utils.js");
 const auth = require("../middlewares/authMiddleware.js");
@@ -146,6 +141,13 @@ router.get("/profile", passport.authenticate("current", { session: false, failur
     res.status(200).render("profile", { titulo, usuario, isLogin: req.user });
 });
 
+router.get("/reqresetpassword", (req, res) => {
+    let titulo = `Restablecer contrasena`;
+
+    res.setHeader('Content-type', 'text/html');
+    res.status(200).render("reqresetpassword", { titulo });
+});
+
 router.get("/resetpassword", (req, res) => {
     let titulo = `Bienvenido`;
 
@@ -164,7 +166,6 @@ router.get('/products/:pid([a-f0-9]+)', passport.authenticate("current", { sessi
 
     try {
         // Obtener los productos con el ID pid
-        //let product = await ProductsManager.getProductBy({ _id: pid });
         let product = await productsService.getProductBy({ _id: pid });
         if (!product) {
             res.setHeader('Content-type', 'application/json');
@@ -196,7 +197,6 @@ router.get('/carts/:cid([a-f0-9]+)', passport.authenticate("current", { session:
 
     try {
         // Obtener los productos del carrito con el ID cid
-        //const cart = await CartsManager.getCartBy(cid);
         const cart = await cartsService.getCartBy(cid);
 
         if (!cart) {
@@ -229,7 +229,6 @@ router.get('/carts/:cid([a-f0-9]+)', passport.authenticate("current", { session:
 })
 
 //4. EndPoint para vista productos
-//router.get('/products', passport.authenticate("current", { session: false }), async (req, res) => {
 router.get('/products', passportCall("current"), async (req, res) => {
 
     let prodss;
@@ -284,7 +283,6 @@ router.get('/products', passportCall("current"), async (req, res) => {
     try {
         if (!query) {
             //console.log('Busqueda general');
-            //prodss = await ProductsManager.getProductsPaginate(page, limit, cSort);
             prodss = await productsService.getProductsPaginate(page, limit, cSort);
         } else {
             //console.log('Busqueda por criterio');
@@ -301,7 +299,6 @@ router.get('/products', passportCall("current"), async (req, res) => {
                 searchCriteria = { stock: query }; // Insensible a mayus/minus
             }
 
-            //prodss = await ProductsManager.getProductsPaginate(page, limit, cSort, searchCriteria);
             prodss = await productsService.getProductsPaginate(page, limit, cSort, searchCriteria);
 
             if (prodss.docs.length === 0) {
@@ -381,7 +378,6 @@ router.get('/products', passportCall("current"), async (req, res) => {
 })
 
 //5. EndPoint para vista de productos en tiempo real usando socket.io
-//router.get('/realtimeproducts', authMiddleware, async (req, res) => {
 router.get('/realtimeproducts', passportCall("current"), auth(['global', 'external', 'user']), async (req, res) => {
 
     let prodss;
@@ -436,7 +432,6 @@ router.get('/realtimeproducts', passportCall("current"), auth(['global', 'extern
     try {
         if (!query) {
             //console.log('Busqueda general');            
-            //prodss = await ProductsManager.getProductsPaginate(page, limit, cSort);
             prodss = await productsService.getProductsPaginate(page, limit, cSort);
         } else {
             //console.log('Busqueda por criterio');
@@ -453,7 +448,6 @@ router.get('/realtimeproducts', passportCall("current"), auth(['global', 'extern
                 searchCriteria = { stock: query }; // Insensible a mayus/minus
             }
 
-            //prodss = await ProductsManager.getProductsPaginate(page, limit, cSort, searchCriteria);
             prodss = await productsService.getProductsPaginate(page, limit, cSort, searchCriteria);
 
             if (prodss.docs.length === 0) {

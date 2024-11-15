@@ -10,7 +10,7 @@ class ProductsManager {
 
             return prods;
         } else {
-            //throw new Error("Archivo de heroes inexistente, o mal definido")
+            
             return [];
         }
     }

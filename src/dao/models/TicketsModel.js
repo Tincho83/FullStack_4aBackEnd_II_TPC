@@ -14,7 +14,7 @@ const ticketsSchema = new mongoose.Schema(
     },
     {
         timestamps: true,
-        //strict: false, //sacar para usuarios
+        //strict: false, 
     }
 )
 

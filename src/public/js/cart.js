@@ -57,15 +57,13 @@ async function CartPurchase(cartId) {
   
         const ticketCode = result.ticket.code;
         const ticketMail = result.ticket.purchaser;
-        //const ticketCode = result.code;
-        //const ticketMail = result.purchaser;
 
         const mySwal = Swal.fire('Compra realizada',
             `Tu compra con ticket ${ticketCode} se ha realizado con exito. se envia al mail "${ticketMail}" el detalle de la compra`,
             'success');
         setTimeout(() => {
             mySwal.close();
-            window.location.href = `/carts/${cartId}`; // Reemplaza con la URL deseada
+            window.location.href = `/carts/${cartId}`; 
         }, 5000);
 
     } else {

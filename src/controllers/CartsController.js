@@ -410,10 +410,7 @@ Productos sin stock: ${prodsinStock.map(p => p.product._id)} `);
 
 
 
-
-            // ***********************************
-
-            // Configuración del transporte de Nodemailer
+            // Config transporte de Nodemailer
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 port: 587,
@@ -437,17 +434,18 @@ Productos sin stock: ${prodsinStock.map(p => p.product._id)} `);
             `
             };
 
-            // Enviar el correo
-            await transporter.sendMail(mailOptions);
 
-            // *****************************
 
             // enviar un mail
-            // try {
-
-            // } catch (error) {
-
-            // }
+            try {
+            // Enviar el correo
+            await transporter.sendMail(mailOptions);
+            } catch (error) {
+                console.error("Error al enviar el correo de confirmación:", error);
+                // Si falla el envio del mail
+                // Se avisa con un mensaje en la response
+                response.alerta = "Compra realizada, pero hubo un problema al enviar el correo de confirmación.";
+            }
 
             if (error) {
                 res.setHeader('Content-Type', 'application/json');
@@ -455,11 +453,12 @@ Productos sin stock: ${prodsinStock.map(p => p.product._id)} `);
                     ticket,
                     alerta: `Atencion: algún/os ítem/s no se pudieron procesar por falta de stock al momento de la compra.
 Intente comprar los productos restantes mas tarde o llamemos.`,
-                    "Prods_sin_Stock": prodsinStock.map(p => p.product._id)
+                    "Prods_sin_Stock": prodsinStock.map(p => p.product._id, ),
+                    aviso: response.alert
                 });
             } else {
                 res.setHeader('Content-Type', 'application/json');
-                return res.status(200).json(ticket);
+                return res.status(200).json( { ticket, aviso: response.alerta || null });
             }
         } catch (error) {
             console.log("Error en el proceso de compra.");

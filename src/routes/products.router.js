@@ -1,7 +1,4 @@
 const { Router } = require("express");
-//const { isValidObjectId } = require("mongoose");
-//const passportJWT = require("passport-jwt");
-//const jwt = require("jsonwebtoken");
 const passport = require("passport");
 
 

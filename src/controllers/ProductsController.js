@@ -173,7 +173,7 @@ class ProductsController {
         }
 
         try {
-            console.log("code: ", code);
+            //console.log("code: ", code);
             let existe = await productsService.getProductBy({ code })
             if (existe) {
                 res.setHeader('Content-type', 'application/json');

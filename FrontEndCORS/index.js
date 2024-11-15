@@ -19,7 +19,7 @@ btnConsultas.addEventListener("click", async (e) => {
 
         const datos = await respuesta.json();
 
-        const users = datos.users; // Accede al array de usuarios en datos.users
+        const users = datos.users;
 
         if (!Array.isArray(users)) {
             divConsultas.textContent = `Formato de respuesta inesperado`;
@@ -27,7 +27,7 @@ btnConsultas.addEventListener("click", async (e) => {
             return;
         }
 
-        divConsultas.textContent = ""; // Limpiar contenido previo
+        divConsultas.textContent = "";
         users.forEach(u => {
             let parrafo = document.createElement("p");
             parrafo.innerHTML = `Usuarios: <b>${u.fullname}</b> | Edad: <b>${u.age}</b> | Email Nro. Pedido: <b>${u.email}</b> - Total a Pagar: <b>$${u.age}</b>`;

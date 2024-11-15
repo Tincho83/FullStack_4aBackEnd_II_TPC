@@ -10,7 +10,7 @@ class UsersController {
 
             res.setHeader('Content-type', 'application/json');
             return res.status(200).json({ users })
-            //res.send({ result: "sucess", payload: users });
+
         } catch (error) {
             console.log("Imposible obtener usuarios desde la BBDD. " + error);
             processesErrors(res, error);
@@ -42,9 +42,7 @@ class UsersController {
     }
 
     static createUser = async (req, res) => {
-        //{"first_name": "Operario", "last_name": "Operario", "email": "operario@test.com", "password":"ope123" }
-        //{"first_name": "Admin", "last_name": "Admin", "email": "admin@test.com", "role": "admin", "password":"admin123" }
-
+       
         let { first_name, last_name, email, age, role, password } = req.body;
 
         if (!first_name || !last_name || !email || !age || !password) {
@@ -53,7 +51,7 @@ class UsersController {
         }
 
         try {
-            console.log("email: ", email);
+       
             let existe = await usersService.getUserBy({ email })
             if (existe) {
                 res.setHeader('Content-type', 'application/json');
@@ -63,7 +61,7 @@ class UsersController {
             const result = await usersService.createUser({ first_name, last_name, email, age, role, password });
             res.setHeader('Content-type', 'application/json');
             return res.status(201).json({ result });
-            //res.send({ status: 'success', payload: result });
+         
         } catch (error) {
             processesErrors(res, error);
         }

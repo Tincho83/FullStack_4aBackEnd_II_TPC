@@ -14,7 +14,7 @@ const cartProtectMiddleware = (roles = []) => {
         }
 
         let ciduser = req.user.cartid;
-        const role = req.user.role; //
+        const role = req.user.role;
 
         if (!roles.includes(role) && ciduser !== cid) {
             console.log("Tu Carrito Id no concuerda con el indicado. No posees autorizacion para modificar el carrito id: ", cid);
