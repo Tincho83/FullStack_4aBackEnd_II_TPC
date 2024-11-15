@@ -2,6 +2,7 @@
 
 class UsersDTO {
     constructor(user) {
+        console.log(">DTO Users:");
         this.first_name = user.first_name.toUpperCase();
         this.last_name = user.last_name ? user.last_name.toUpperCase() : "";
         this.fullname = this.first_name + " " + this.last_name;

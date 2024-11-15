@@ -1,6 +1,6 @@
 class ProductsDTO {
     constructor(product) {
-
+        console.log(">DTO Products:");
         this._id = product._id;
         this.title = product.title;
         this.description = product.description?product.description.toUpperCase():"";

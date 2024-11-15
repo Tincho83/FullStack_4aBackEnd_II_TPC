@@ -9,6 +9,7 @@ class ProductsService {
     }
 
     async getProducts() {
+        console.log(">Service Get Products:");
         let Products = await this.productsDAO.getProducts();
 
         if (Array.isArray(Products)) {
@@ -24,6 +25,7 @@ class ProductsService {
     }
 
     async getProductsPaginate(page, limit, sort, searchCriteria) {
+        console.log(">Service Get Products (Paginate):");
         let ProductsPag = await this.productsDAO.getProductsPaginate(page, limit, sort, searchCriteria);
 
         // Comprobar de que docs este antes de aplicarle ProductsDTO
@@ -36,6 +38,7 @@ class ProductsService {
     }
 
     async getProductBy(filter = {}) {
+        console.log(">Service GetBy Product:");
         let product = await this.productsDAO.getProductBy(filter);
 
         if (Array.isArray(product)) {
@@ -50,18 +53,22 @@ class ProductsService {
     }
 
     async getProductById(product) {
+        console.log(">Service GetBy Id Product:");
         return await this.productsDAO.getProductById(product);
     }
 
     async addProduct(product) {
+        console.log(">Service Create Product:");
         return await this.productsDAO.addProduct(product);
     }
 
     async updateProduct(id, product) {
+        console.log(">Service Update Product:");
         return await this.productsDAO.updateProduct(id, product);
     }
 
     async deleteProduct(id) {
+        console.log(">Service Delete Product:");
         return await this.productsDAO.deleteProduct(id);
     }
 

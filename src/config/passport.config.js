@@ -19,6 +19,7 @@ const cookieExtractor = req => {
     if (req.cookies.currentUser) {
         token = req.cookies.currentUser;
     }
+
     return token;
 }
 
@@ -168,6 +169,7 @@ const initPassport = () => {
                 jwtFromRequest: new passportJWT.ExtractJwt.fromExtractors([cookieExtractor])
             },
             async (user, done) => {
+                console.log(">PassportCurrent: ");
                 try {
                     if (user.status === "disable") {
                         console.log("passport.config: La cuenta esta deshabilitada momentaneamente, consulte al Administrador.");
@@ -180,6 +182,7 @@ const initPassport = () => {
 
                     return done(null, user);
                 } catch (error) {
+
                     return done(error);
                 }
             }

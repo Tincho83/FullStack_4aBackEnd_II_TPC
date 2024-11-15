@@ -48,12 +48,14 @@ Aplicativo Backend para e-commerce realizado en javascript, express, Handlebars,
 ### Pasos / Steps
 - Abrir VS Code / Open Vs Code
 - Clonar repositorio / Clone Repository
-   -  **git clone https://github.com/Tincho83/FullStack_4aBackEnd_I_TP3.git**
+   -  **git clone https://github.com/Tincho83/FullStack_4aBackEnd_II_TPC.git**
    o  
-   -  **git clone git@github.com:Tincho83/FullStack_4aBackEnd_I_TP3.git** 
+   -  **git clone git@github.com:Tincho83/FullStack_4aBackEnd_II_TPC.git** 
 
 - Acceder a la carpeta del proyecto / Access to project folder
-   - **cd FullStack_4aBackEnd_I_TP3**
+   - **cd FullStack_4aBackEnd_II_TPC-main**
+
+- Copiar archivos .env (Para Desarrollo o Produccion) dentro de la carpeta "src" (FullStack_4aBackEnd_II_TPC-main\src)
 
 - Instalar todas las dependecias del proyecto/ Install dependencies
    - **npm install**
@@ -90,7 +92,8 @@ Aplicativo Backend para e-commerce realizado en javascript, express, Handlebars,
 
 ### Estructura del proyecto / Project structure
 
-#### Carpeta raiz del proyecto
+#### Carpeta raiz del proyecto 
+   -  **FrontEndCORS** Pagina Web basica para consumir recurso desde el backend y corroborrar el uso de CORS.
    -  **node_modules** (No disponible en el repositorio, aparecera cuando instalen las dependencias del   proyecto.)
    -  **src** (Carpeta que contiene los fuentes del proyecto)
    -  **.gitignore** (No disponible en el Repositorio. Solo para uso de git. Crear archivo .gitignore y agregar el texto (sin comillas): "node_modules" )
@@ -99,7 +102,7 @@ Aplicativo Backend para e-commerce realizado en javascript, express, Handlebars,
    -  **Readme.md** (Este archivo)   
       
 
-#### Carpeta "src"
+#### Carpeta "src" (En Proceso)
    - **config** contiene las rutas para los endpoints
          - **config.js** contiene en variables informacion a usar en la aplicacion.
    -  **dao** (Data Access Object, contiene los administradores para acceso a datos):

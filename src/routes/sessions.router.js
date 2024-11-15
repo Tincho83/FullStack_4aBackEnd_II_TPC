@@ -94,7 +94,8 @@ router.post("/login",
             res.cookie("currentUser", token, { httpOnly: true });
 
             res.setHeader('Content-type', 'application/json');
-            return res.status(200).json({ payload: `Login Ok para ${req.user.first_name} ${JSON.stringify(req.user, null, 5)} token: ${token}`, existe });
+            //return res.status(200).json({ payload: `Login Ok para ${req.user.first_name} ${JSON.stringify(req.user, null, 5)} token: ${token}`, existe });
+            return res.status(200).json({ payload: `Login Ok para ${req.user.email} (${existe.fullname}) token: ${token}`, existe });
         } catch (error) {
             processesErrors(res, error);
         }
@@ -300,7 +301,6 @@ router.get("/current",
     passport.authenticate("current", { session: false, failureRedirect: "/api/sessions/error" }),
     (req, res) => {
         try {
-
             res.setHeader('Content-type', 'application/json');
             return res.status(200).json({ message: 'User Current Logged.', user: req.user, });
         } catch (error) {
